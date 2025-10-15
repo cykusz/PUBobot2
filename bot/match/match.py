@@ -231,6 +231,16 @@ class Match:
 			self.teams[0].set(random.sample(self.players, min(len(self.players)//2, self.cfg['team_size'])))
 			self.teams[1].set([p for p in self.players if p not in self.teams[0]][:self.cfg['team_size']])
 			self.teams[2].set([p for p in self.players if p not in [*self.teams[0], *self.teams[1]]])
+		elif pick_teams == "matchmaking STW":
+			team_len = min(self.cfg['team_size'], int(len(self.players)/2))
+			sorted_players = self.sort_players(self.players)
+			self.teams[0].clear()
+			self.teams[1].clear()
+			self.teams[2].clear()
+			for strongest_player in sorted_players[:team_len*2]:
+				weakest = 0 if sum([self.ratings[m.id] for m in self.teams[0]]) > sum([self.ratings[m.id] for m in self.teams[1]]) else 1
+				self.teams[weakest].append(strongest_player)
+			self.teams[2].set(sorted_players[team_len*2:])			
 
 	async def think(self, frame_time):
 		if self.state == self.INIT:
